@@ -1,0 +1,32 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+credentials.json
+token.json
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Logs & local state
+logs/
+*.log
+progress.json
+
+# Original standalone clones (kept local, not part of monorepo)
+/Meeting Prep Agent/
+/Morning Briefing Agent/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

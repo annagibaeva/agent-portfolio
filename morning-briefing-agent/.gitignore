@@ -1,0 +1,10 @@
+token.json
+credentials.json
+logs/briefing.log
+__pycache__/
+*.pyc
+.env
+
+.claude/
+progress.json
+auth_setup.py
