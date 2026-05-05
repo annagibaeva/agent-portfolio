@@ -1,25 +1,26 @@
 # Agent Portfolio
 
-A portfolio of 10 agents exploring different patterns: tool use, MCP servers, scheduled runs, multi-agent orchestration, and evaluation. Each project is a standalone subfolder.
+A portfolio exploring different agent patterns: tool use, MCP servers, scheduled runs, multi-agent orchestration, and evaluation. Each project is a standalone subfolder.
 
-## Projects
+## Status
 
-1. **Morning Briefing Agent** — you already have a version. Rebuild it properly: Claude Code + Gmail MCP + Google Calendar MCP + a news fetch tool. Success metric: time-to-read-brief under 90 seconds.
+| # | Project | Status | Notes |
+|---|---|---|---|
+| 1 | [Morning Briefing Agent](./morning-briefing-agent) | **Built** | Daily 07:15 brief; Calendar + Gmail + news fetch; Claude composes Meeting Context + AI Pulse. |
+| 2 | [Meeting Prep Agent](./meeting-prep-agent) | **Built** | Per-meeting one-page brief via Claude Agent SDK; in-process MCP tools for Calendar/Gmail/manual context. |
+| 3 | PM Workflow Agent | Planned | Idea → PRD draft using PM OS templates loaded as Claude Skills. |
+| 4 | Competitive Intel Agent | Planned | Scheduled diffs across competitor changelogs via custom MCP server. |
+| 5 | Data Quality Agent | Planned | CSV / DB profiling → data-readiness memo. |
+| 6 | Job Market Agent | Planned | Singapore agent-PM listings, scored against personal criteria. |
+| 7 | GitHub Portfolio Reviewer Agent | Planned | Subagent harness; README / test / doc-code review with PM-style readiness report. |
+| 8 | Multi-agent Research Crew | Planned | LangGraph or CrewAI; orchestrator + researcher + critic + writer. |
+| 9 | Agent Evaluation Harness | Planned | Golden-set runner, Langfuse logging, GitHub PR scorecard. |
+| 10 | Snapshot V2 / PM OS agent | Planned | Agentic layer on top of an existing side project. |
 
-2. **Meeting Prep Agent** — pulls attendees from calendar, recent emails with them, LinkedIn context (manual paste is fine), prior meeting notes from Notion/Drive. Output: one-page brief with talking points and open threads.
+## Conventions
 
-3. **PM Workflow Agent** — ingests a product idea, produces a PRD draft using your PM OS templates, suggests metrics, lists open questions. Uses Claude Skills to load your PRD template.
+Shared working-style and safety rules live in [CLAUDE.md](./CLAUDE.md). Every agent ships with a `README.md`, a `RUNBOOK.md`, `requirements.txt`, and (when applicable) `prompts/`, `tools/`, and `evals/`.
 
-4. **Competitive Intel Agent** — scheduled run: watches 5–10 competitor domains / changelogs / release notes, surfaces weekly diff with PM-relevant commentary. Uses a custom MCP server for changelog parsing.
+## Running anything here
 
-5. **Data Quality Agent** — point it at a CSV or a database connection, it profiles the data, flags issues (nulls, outliers, schema drift), drafts a data-readiness memo. Directly plays your Mars "fix data before AI" muscle.
-
-6. **Job Market Agent** — scrapes/queries agent-PM job listings in Singapore, scores them against your criteria (remote-friendly, local hours, agent focus, stage), drafts tailored cover-letter starting points.
-
-7. **GitHub Portfolio Reviewer Agent** — a subagent harness in Claude Code. Given a repo, it reviews README quality, test coverage, doc-code alignment, and produces a PM-style readiness report. You'll use it on your own portfolio.
-
-8. **Multi-agent Research Crew** — LangGraph or CrewAI. Topic in, research brief out. Orchestrator + researcher + critic + writer subagents. This is your multi-agent showcase piece.
-
-9. **Agent Evaluation Harness** — not an agent, a tool for evaluating agents. Runs a golden set against one of your agents above, logs to Langfuse, posts a scorecard to GitHub on each PR. This is the artefact that most clearly signals "I understand productionisation."
-
-10. **Snapshot V2 / PM OS agent** — pick one of your existing side projects (Snapshot school finder or PM OS) and add an agentic layer. Shows you can ship *and* then agent-ify an existing product.
+Each agent has its own quick-start in its README. None of them share a Python environment — install per-agent.
