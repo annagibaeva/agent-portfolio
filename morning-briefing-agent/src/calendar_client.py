@@ -4,7 +4,7 @@ from google.oauth2.credentials import Credentials
 
 
 def build_service(creds: Credentials):
-    return build("calendar", "v3", credentials=creds)
+    return build("calendar", "v3", credentials=creds, cache_discovery=False)
 
 
 def list_today_events(creds: Credentials | None = None, today: date | None = None) -> list[dict] | None:

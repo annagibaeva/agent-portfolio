@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 
 
 def build_service(creds: Credentials):
-    return build("gmail", "v1", credentials=creds)
+    return build("gmail", "v1", credentials=creds, cache_discovery=False)
 
 
 def _yesterday_query() -> str:

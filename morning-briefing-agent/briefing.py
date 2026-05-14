@@ -9,6 +9,8 @@ from config import (
     TOKEN_FILE, CREDENTIALS_FILE, GOOGLE_SCOPES,
     EMAIL_TO,
 )
+from google.auth.exceptions import RefreshError
+from src.alerts import send_smtp_alert
 from src.auth import get_google_credentials
 from src.calendar_client import list_today_events
 from src.gmail_client import search_meeting_threads, search_substacks, send_email
@@ -47,6 +49,18 @@ def run(today: date | None = None) -> None:
 
     try:
         creds = get_google_credentials(TOKEN_FILE, CREDENTIALS_FILE, GOOGLE_SCOPES)
+    except RefreshError as e:
+        logging.error("!!! GOOGLE_AUTH_EXPIRED !!! Re-run `python auth_setup.py` to mint a fresh token. Detail: %s", e)
+        send_smtp_alert(
+            subject="[morning-briefing-agent] Google OAuth token expired — action required",
+            body=(
+                "The morning-briefing-agent failed to refresh its Google OAuth token "
+                "and cannot read Calendar/Gmail or send the briefing.\n\n"
+                "Fix: run `python auth_setup.py` in the agent directory to re-authorize.\n\n"
+                f"Error: {e}\n"
+            ),
+        )
+        creds = None
     except Exception:
         logging.exception("Google auth failed — run with no credentials")
         creds = None

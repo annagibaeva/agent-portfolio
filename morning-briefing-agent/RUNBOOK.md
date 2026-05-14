@@ -44,7 +44,7 @@ Target: ~250 words total, readable in <90 seconds.
 
 | Failure | Symptom | Handling |
 |---|---|---|
-| Missing/expired Google token | `auth.py` raises during pipeline start | Run `python auth_setup.py` to refresh |
+| Missing/expired Google token | `auth.py` raises `RefreshError`; `briefing.py` logs `!!! GOOGLE_AUTH_EXPIRED !!!` and fires SMTP fallback alert | Run `python auth_setup.py` to refresh |
 | Calendar / Gmail API 5xx or quota | Section returns empty | Brief is still composed and sent; that section shows fallback text |
 | Anthropic blog HTML structure changes | News fetch returns nothing | AI Pulse drops the blog item; Substack summaries still send |
 | Claude API failure during composition | `composer.py` raises | **Currently:** pipeline aborts, no email sent. **TODO:** add fallback that sends a raw-data email with sections from tools only |
@@ -73,6 +73,27 @@ With `claude-sonnet-4-6` (≈$3 / MTok input, $15 / MTok output) that's roughly 
 3. If Anthropic API → check key + balance; rerun `python briefing.py`.
 4. If `progress.json` is corrupt → delete it; the next run rebuilds from start date in `config.py`.
 5. To dry-run without sending: `python briefing.py --dry-run` *(planned — not yet implemented; currently composes and sends in one path)*.
+
+## Alerting
+
+On Google auth failure, `briefing.py` sends a fallback alert via SMTP (not the Gmail API — that path shares fate with the thing that's broken). Requires env vars:
+
+- `ALERT_SMTP_HOST` (e.g. `smtp.gmail.com`)
+- `ALERT_SMTP_USER` (sender, e.g. operator's Gmail address)
+- `ALERT_SMTP_PASS` (Gmail **app password**, not account password)
+- `ALERT_TO` (alert recipient)
+- `ALERT_SMTP_PORT` (optional, default 587)
+
+If unset, the alert is skipped and a warning is logged. Test with:
+`python -c "from src.alerts import send_smtp_alert; print(send_smtp_alert('test', 'body'))"`
+
+## Change log
+
+- **2026-05-14** — Token refresh failures (2026-05-08 → 2026-05-11) traced to OAuth client stuck in Testing mode (7-day refresh-token expiry). Fixes applied:
+  1. Re-ran `auth_setup.py` to mint fresh token.
+  2. Published OAuth app to Production in Google Cloud Console — refresh tokens no longer expire on a schedule.
+  3. `briefing.py` now catches `RefreshError` explicitly, logs a loud marker line, and sends an SMTP fallback alert via new `src/alerts.py`.
+  4. Added `cache_discovery=False` to `build()` calls in `calendar_client.py` / `gmail_client.py` to silence `oauth2client<4.0.0` warnings.
 
 ## Local files of note
 
