@@ -5,6 +5,8 @@ import os
 import re
 from pathlib import Path
 
+import intake
+
 from claude_agent_sdk import (
     query, ClaudeAgentOptions, AssistantMessage, TextBlock, ResultMessage,
 )
@@ -71,6 +73,31 @@ def token_total(usages: list[dict]) -> int:
     return sum(int(u.get(k, 0)) for u in usages for k in keys)
 
 
+def merge_usage(usages: list[dict]) -> dict:
+    """Sum the token fields across usage dicts into one dict."""
+    keys = (
+        "input_tokens", "output_tokens",
+        "cache_read_input_tokens", "cache_creation_input_tokens",
+    )
+    return {k: sum(int(u.get(k, 0)) for u in usages) for k in keys}
+
+
+async def _run_validated(prompt, *, system, use_skill, validate):
+    """Run a turn; if validate(text) raises, retry once. Merges usage of both."""
+    usages: list[dict] = []
+    last_exc: Exception | None = None
+    for _ in range(2):
+        text, usage = await _run(prompt, system=system, use_skill=use_skill)
+        usages.append(usage)
+        try:
+            validate(text)
+            return text, merge_usage(usages)
+        except Exception as exc:  # noqa: BLE001 - validator decides what's fatal
+            last_exc = exc
+    assert last_exc is not None
+    raise last_exc
+
+
 async def _run(prompt: str, *, system: str, use_skill: bool) -> tuple[str, dict]:
     """One stateless query(). Returns (joined assistant text, usage dict)."""
     opts = ClaudeAgentOptions(
@@ -92,18 +119,23 @@ async def _run(prompt: str, *, system: str, use_skill: bool) -> tuple[str, dict]
 
 
 async def run_intake(idea: str) -> tuple[str, dict]:
-    """Intake turn: returns (raw text containing questions JSON, usage)."""
-    return await _run(
-        f"Product idea:\n{idea}", system=_read("intake.md"), use_skill=False,
+    """Intake turn with one retry. Returns (text containing questions JSON, usage)."""
+    return await _run_validated(
+        f"Product idea:\n{idea}",
+        system=_read("intake.md"),
+        use_skill=False,
+        validate=intake.parse_questions,
     )
 
 
 async def run_draft(idea: str, qa: list[tuple[str, str]]) -> tuple[str, dict]:
-    """Draft turn: returns (raw text containing PRD markdown block, usage)."""
+    """Draft turn with one retry. Returns (text containing PRD markdown, usage)."""
     answered = "\n".join(f"- Q: {q}\n  A: {a}" for q, a in qa) or "(none)"
     prompt = (
         f"Product idea:\n{idea}\n\n"
         f"Clarifying answers:\n{answered}\n\n"
         "Draft the PRD now using the prd-writer skill."
     )
-    return await _run(prompt, system=_read("system.md"), use_skill=True)
+    return await _run_validated(
+        prompt, system=_read("system.md"), use_skill=True, validate=extract_prd_block,
+    )
