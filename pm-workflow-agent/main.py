@@ -109,7 +109,7 @@ async def run(idea: str, answers: dict[str, str] | None) -> int:
             print(f"   - {s}")
 
     logger.log(run_id, step="draft", status="ok", tokens=tokens, output=str(out_path))
-    print(logger.trace_summary(run_id, turns=2, tokens=tokens, outcome="ok"))
+    print(logger.trace_summary(run_id, turns=len(usages), tokens=tokens, outcome="ok"))
     print(f"\nPRD written to {out_path}")
     return 0
 
