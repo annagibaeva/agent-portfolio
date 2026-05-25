@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Data Quality Agent workflow and architecture infographic</title>
+  <desc id="desc">A first-time-user visual showing the profile, review, init-config, and run workflow plus the internal agent architecture.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .ink { fill: #18202f; font-family: Inter, Segoe UI, Arial, sans-serif; }
+      .muted { fill: #596273; font-family: Inter, Segoe UI, Arial, sans-serif; }
+      .small { font-size: 22px; }
+      .body { font-size: 25px; }
+      .label { font-size: 24px; font-weight: 700; }
+      .title { font-size: 48px; font-weight: 800; }
+      .subtitle { font-size: 26px; }
+      .card { fill: #ffffff; stroke: #d9dee8; stroke-width: 2; rx: 8; }
+      .command { fill: #152033; rx: 6; }
+      .commandText { fill: #f7fbff; font-family: Consolas, Menlo, monospace; font-size: 22px; }
+      .blue { fill: #dceeff; stroke: #5b9bd5; }
+      .green { fill: #e1f5e8; stroke: #3fa76d; }
+      .amber { fill: #fff0d6; stroke: #d99022; }
+      .red { fill: #ffe4e0; stroke: #d65a4a; }
+      .purple { fill: #ece7ff; stroke: #7762d6; }
+      .line { stroke: #5f6b7c; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .thinLine { stroke: #98a2b3; stroke-width: 3; fill: none; marker-end: url(#arrowSmall); }
+      .dash { stroke-dasharray: 10 8; }
+      .pill { rx: 20; }
+      .num { fill: #18202f; font-size: 26px; font-weight: 800; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f6b7c"/>
+    </marker>
+    <marker id="arrowSmall" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#98a2b3"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1400" height="1000"/>
+
+  <text x="70" y="82" class="ink title">Data Quality Agent</text>
+  <text x="70" y="124" class="muted subtitle">First-time workflow: explore a dataset, turn findings into a reusable contract, then run repeatable readiness checks.</text>
+
+  <rect x="70" y="170" width="1260" height="285" class="card"/>
+  <text x="100" y="215" class="ink label">How to start</text>
+
+  <rect x="100" y="250" width="250" height="150" class="blue card"/>
+  <circle cx="130" cy="282" r="20" fill="#ffffff" stroke="#5b9bd5" stroke-width="2"/>
+  <text x="122" y="291" class="num">1</text>
+  <text x="160" y="288" class="ink label">Profile</text>
+  <text x="125" y="328" class="muted small">First-pass exploration</text>
+  <rect x="125" y="348" width="195" height="34" class="command"/>
+  <text x="137" y="371" class="commandText">dq-agent profile</text>
+
+  <path d="M 360 325 L 435 325" class="line"/>
+
+  <rect x="455" y="250" width="250" height="150" class="green card"/>
+  <circle cx="485" cy="282" r="20" fill="#ffffff" stroke="#3fa76d" stroke-width="2"/>
+  <text x="477" y="291" class="num">2</text>
+  <text x="515" y="288" class="ink label">Review Memo</text>
+  <text x="480" y="328" class="muted small">Verdict, findings, fixes</text>
+  <text x="480" y="365" class="muted small">Markdown + JSON output</text>
+
+  <path d="M 715 325 L 790 325" class="line"/>
+
+  <rect x="810" y="250" width="250" height="150" class="amber card"/>
+  <circle cx="840" cy="282" r="20" fill="#ffffff" stroke="#d99022" stroke-width="2"/>
+  <text x="832" y="291" class="num">3</text>
+  <text x="870" y="288" class="ink label">Draft Config</text>
+  <text x="835" y="328" class="muted small">Create team rules</text>
+  <rect x="835" y="348" width="200" height="34" class="command"/>
+  <text x="846" y="371" class="commandText">init-config</text>
+
+  <path d="M 1070 325 L 1145 325" class="line"/>
+
+  <rect x="1165" y="250" width="135" height="150" class="purple card"/>
+  <circle cx="1195" cy="282" r="20" fill="#ffffff" stroke="#7762d6" stroke-width="2"/>
+  <text x="1187" y="291" class="num">4</text>
+  <text x="1225" y="288" class="ink label">Run</text>
+  <text x="1190" y="328" class="muted small">Repeatable</text>
+  <text x="1190" y="360" class="muted small">checks</text>
+  <rect x="1190" y="376" width="82" height="34" class="command"/>
+  <text x="1202" y="399" class="commandText">run</text>
+
+  <rect x="70" y="500" width="595" height="405" class="card"/>
+  <text x="100" y="545" class="ink label">What happens in the background</text>
+
+  <rect x="105" y="585" width="215" height="70" class="blue card"/>
+  <text x="130" y="628" class="ink body">Connector Layer</text>
+  <text x="130" y="685" class="muted small">CSV, XLSX, JSON, JSONL</text>
+  <path d="M 320 620 L 395 620" class="thinLine"/>
+
+  <rect x="405" y="585" width="215" height="70" class="green card"/>
+  <text x="430" y="628" class="ink body">Profiler</text>
+  <text x="430" y="685" class="muted small">Types, nulls, min/max, stats</text>
+
+  <path d="M 512 655 L 512 718" class="thinLine"/>
+
+  <rect x="405" y="730" width="215" height="70" class="amber card"/>
+  <text x="430" y="773" class="ink body">Rule Engine</text>
+  <text x="430" y="830" class="muted small">Required, bounds, enums, expressions</text>
+  <path d="M 395 765 L 320 765" class="thinLine"/>
+
+  <rect x="105" y="730" width="215" height="70" class="purple card"/>
+  <text x="130" y="773" class="ink body">Report Writer</text>
+  <text x="130" y="830" class="muted small">Markdown memo + JSON report</text>
+
+  <path d="M 212 730 L 212 655" class="thinLine"/>
+  <text x="110" y="878" class="muted small">Exit codes: 0 ready, 1 warnings/review, 2 not ready, 3 execution failure</text>
+
+  <rect x="735" y="500" width="595" height="405" class="card"/>
+  <text x="765" y="545" class="ink label">What the agent decides vs. what you decide</text>
+
+  <rect x="770" y="585" width="240" height="250" class="green card"/>
+  <text x="800" y="630" class="ink body">Agent discovers</text>
+  <text x="800" y="675" class="muted small">- Columns present</text>
+  <text x="800" y="710" class="muted small">- Inferred data types</text>
+  <text x="800" y="745" class="muted small">- Nulls and duplicates</text>
+  <text x="800" y="780" class="muted small">- Outlier candidates</text>
+  <text x="800" y="815" class="muted small">- Draft config hints</text>
+
+  <path d="M 1025 710 L 1080 710" class="line"/>
+
+  <rect x="1090" y="585" width="205" height="250" class="amber card"/>
+  <text x="1120" y="630" class="ink body">You define</text>
+  <text x="1120" y="675" class="muted small">- Required columns</text>
+  <text x="1120" y="710" class="muted small">- Primary key</text>
+  <text x="1120" y="745" class="muted small">- Allowed values</text>
+  <text x="1120" y="780" class="muted small">- Valid ranges</text>
+  <text x="1120" y="815" class="muted small">- Business rules</text>
+
+  <rect x="765" y="862" width="530" height="28" fill="none"/>
+  <text x="765" y="884" class="muted small">Rule of thumb: profile finds facts; config turns facts into a team contract.</text>
+
+  <rect x="70" y="930" width="1260" height="42" class="command"/>
+  <text x="95" y="958" class="commandText">Recommended path: dq-agent profile data.csv  →  review memo  →  dq-agent init-config data.csv  →  edit config  →  dq-agent run config.yml</text>
+</svg>

@@ -4,6 +4,8 @@ Python CLI for profiling local datasets and generating data-readiness reports.
 
 MVP v1 supports CSV, XLSX, JSON, and JSONL files. It profiles the dataset, flags common quality issues, evaluates optional validation rules, and writes both a Markdown memo for humans and a JSON report for automation.
 
+![Data Quality Agent workflow and architecture](docs/assets/data-quality-agent-infographic.svg)
+
 ## Install
 
 From this folder:
