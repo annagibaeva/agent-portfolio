@@ -1,0 +1,6 @@
+.manual-check/
+.pytest-tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+dq-reports/

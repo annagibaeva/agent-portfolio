@@ -1,0 +1,19 @@
+[project]
+name = "dq-agent"
+version = "0.1.0"
+description = "CLI data quality agent for profiling files and producing data-readiness memos."
+requires-python = ">=3.11"
+dependencies = [
+  "pandas",
+  "openpyxl",
+  "pydantic",
+  "pyyaml",
+  "typer",
+]
+
+[project.scripts]
+dq-agent = "dq_agent.cli:app"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
