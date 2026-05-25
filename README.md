@@ -8,7 +8,7 @@ A portfolio exploring different agent patterns: tool use, MCP servers, scheduled
 |---|---|---|---|
 | 1 | [Morning Briefing Agent](./morning-briefing-agent) | **Built** | Daily 07:15 brief; Calendar + Gmail + news fetch; Claude composes Meeting Context + AI Pulse. |
 | 2 | [Meeting Prep Agent](./meeting-prep-agent) | **Built** | Per-meeting one-page brief via Claude Agent SDK; in-process MCP tools for Calendar/Gmail/manual context. |
-| 3 | PM Workflow Agent | Planned | Idea → PRD draft using PM OS templates loaded as Claude Skills. |
+| 3 | [PM Workflow Agent](./pm-workflow-agent) | **Built** | Idea → clarifying questions → PRD draft via the `prd-writer` Claude Skill. Two stateless Agent SDK turns; 6 golden eval cases with live runner. |
 | 4 | Competitive Intel Agent | Planned | Scheduled diffs across competitor changelogs via custom MCP server. |
 | 5 | Data Quality Agent | Planned | CSV / DB profiling → data-readiness memo. |
 | 6 | Job Market Agent | Planned | Singapore agent-PM listings, scored against personal criteria. |
