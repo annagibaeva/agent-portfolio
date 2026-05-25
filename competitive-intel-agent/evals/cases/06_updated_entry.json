@@ -1,0 +1,4 @@
+{"name": "updated_entry",
+ "feed": "<rss version=\"2.0\"><channel><item><title>A</title><link>http://x/a</link><pubDate>Mon, 12 May 2026 00:00:00 GMT</pubDate><description>NEW BODY</description></item></channel></rss>",
+ "known_titled": {"title": "A", "url": "http://x/a", "date": "2026-05-12", "old_body": "old body"},
+ "expect_new": 0, "expect_updated": 1}

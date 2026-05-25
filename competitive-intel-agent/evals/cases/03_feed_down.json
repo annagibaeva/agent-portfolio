@@ -1,0 +1,3 @@
+{"name": "feed_down", "feed_error": true,
+ "html": "<article><h2>Fallback</h2><p>b</p></article>",
+ "css_hint": "article", "known": {}, "expect_new": 1, "expect_ok": true}

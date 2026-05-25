@@ -1,0 +1,3 @@
+{"name": "malformed_commentary",
+ "commentary_payload": {"changes": [{"index": 0, "so_what": "x", "tag": "Bogus", "confidence": 0.5}], "synthesis": {}},
+ "n_changes": 1, "expect_commentary_error": true}

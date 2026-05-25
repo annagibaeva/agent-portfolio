@@ -1,0 +1,3 @@
+{"name": "html_only", "feed": null,
+ "html": "<article><h2>HtmlEntry</h2><time datetime=\"2026-05-12\"></time><p>b</p></article>",
+ "css_hint": "article", "known": {}, "expect_new": 1, "expect_ok": true}
