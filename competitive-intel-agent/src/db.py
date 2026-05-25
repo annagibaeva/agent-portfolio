@@ -84,6 +84,22 @@ class Database:
             return []
         return rows[0]["synthesis"].get("watch_list", [])
 
+    def entry_counts_by_run(self, competitor_name: str,
+                            run_ids: list[str]) -> dict[str, int]:
+        """Count entries first seen in each of the given runs."""
+        cid = self.competitor_id(competitor_name)
+        if not cid or not run_ids:
+            return {}
+        rows = self.client.table("changelog_entries").select(
+            "first_seen_run").eq("competitor_id", cid).in_(
+            "first_seen_run", run_ids).execute().data
+        counts = {rid: 0 for rid in run_ids}
+        for r in rows:
+            rid = r["first_seen_run"]
+            if rid in counts:
+                counts[rid] += 1
+        return counts
+
     def execute_sql(self, sql: str) -> None:
         """Run raw DDL via the Supabase Postgres RPC `exec_sql`."""
         self.client.rpc("exec_sql", {"sql": sql}).execute()
