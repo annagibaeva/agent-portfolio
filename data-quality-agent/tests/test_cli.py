@@ -56,3 +56,40 @@ output:
     assert "Verdict: Not ready" in result.stdout
     assert markdown.exists()
     assert json_report.exists()
+
+
+def test_init_config_command_drafts_reusable_config_from_profile(tmp_path: Path):
+    source = tmp_path / "customers.csv"
+    source.write_text(
+        "customer_id,email,status,revenue\n"
+        "1,a@example.com,active,10\n"
+        "2,b@example.com,paused,20\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "customers-dq.yml"
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "init-config",
+            str(source),
+            "--dataset-name",
+            "customers",
+            "--primary-key",
+            "customer_id",
+            "--out",
+            str(config),
+        ],
+    )
+
+    assert result.exit_code == 0
+    text = config.read_text(encoding="utf-8")
+    assert "name: customers" in text
+    assert "primary_key: customer_id" in text
+    assert "required_columns:" in text
+    assert "- customer_id" in text
+    assert "non_null:" in text
+    assert "allowed_values:" in text
+    assert "status:" in text
+    assert "- active" in text
+    assert "dq-agent run" in result.stdout

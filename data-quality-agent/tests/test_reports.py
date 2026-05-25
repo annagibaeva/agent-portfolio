@@ -36,4 +36,6 @@ def test_report_writers_include_verdict_and_findings(tmp_path: Path):
 
     assert "Ready with caveats" in markdown_path.read_text(encoding="utf-8")
     assert "Example warning" in markdown_path.read_text(encoding="utf-8")
+    assert "## Next Steps" in markdown_path.read_text(encoding="utf-8")
+    assert "dq-agent init-config" in markdown_path.read_text(encoding="utf-8")
     assert '"verdict": "Ready with caveats"' in json_path.read_text(encoding="utf-8")

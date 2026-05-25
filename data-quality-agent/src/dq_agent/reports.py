@@ -76,6 +76,12 @@ def render_markdown_memo(report: QualityReport) -> str:
     lines.extend(
         [
             "",
+            "## Next Steps",
+            "1. Use this memo for first-pass review.",
+            f"2. Draft a reusable config with `dq-agent init-config {report.source.source_path}`.",
+            "3. Edit the config to reflect the dataset contract for your team.",
+            "4. Re-run repeatable checks with `dq-agent run <config.yml>`.",
+            "",
             "## Dataset Profile",
             f"- Source format: `{report.source.source_format}`",
             f"- Rows: {report.profile.row_count:,}",

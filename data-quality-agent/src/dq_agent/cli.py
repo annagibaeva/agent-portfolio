@@ -10,6 +10,7 @@ from dq_agent.connectors import ConnectorError, load_source
 from dq_agent.profiler import profile_dataframe
 from dq_agent.reports import build_report, write_json_report, write_markdown_memo
 from dq_agent.rules import evaluate_rules
+from dq_agent.scaffold import default_config_path, write_draft_config
 from dq_agent.verdict import exit_code_for_verdict
 
 
@@ -54,6 +55,34 @@ def profile(
         write_json_report(report, json_path)
         _print_summary(report, markdown_path, json_path)
         raise typer.Exit(exit_code_for_verdict(report.verdict))
+    except ConnectorError as exc:
+        typer.echo(f"Execution failure: {exc}", err=True)
+        raise typer.Exit(3) from exc
+
+
+@app.command("init-config")
+def init_config(
+    path: Path,
+    sheet: Optional[str] = typer.Option(None, "--sheet", help="Excel sheet name to load."),
+    source_format: Optional[str] = typer.Option(None, "--format", help="Input format override."),
+    dataset_name: Optional[str] = typer.Option(None, "--dataset-name", help="Reusable dataset contract name."),
+    primary_key: Optional[str] = typer.Option(None, "--primary-key", help="Primary key column for uniqueness and non-null checks."),
+    out: Optional[Path] = typer.Option(None, "--out", help="Draft config output path."),
+) -> None:
+    try:
+        loaded = load_source(path, source_format=source_format, sheet_name=sheet, dataset_name=dataset_name)
+        config_path = out or default_config_path(path)
+        write_draft_config(
+            loaded.dataframe,
+            loaded.metadata,
+            config_path,
+            dataset_name=dataset_name,
+            primary_key=primary_key,
+        )
+        typer.echo(f"Draft config: {config_path}")
+        typer.echo("Review and edit the rules, then run:")
+        typer.echo(f"dq-agent run {config_path}")
+        raise typer.Exit(0)
     except ConnectorError as exc:
         typer.echo(f"Execution failure: {exc}", err=True)
         raise typer.Exit(3) from exc

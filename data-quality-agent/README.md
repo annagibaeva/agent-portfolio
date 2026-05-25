@@ -34,6 +34,24 @@ You can also choose explicit output paths:
 dq-agent profile data/customers.csv --out reports/customers-readiness.md --json-out reports/customers-profile.json
 ```
 
+## Universal Team Workflow
+
+Use this loop when a dataset type will be reused by multiple teams:
+
+1. Run `profile` for first-pass exploration.
+2. Review the Markdown memo.
+3. Draft a reusable config from the dataset.
+4. Edit the config to reflect the business contract.
+5. Use `run` for repeatable checks.
+
+```bash
+dq-agent profile data/customers.csv
+dq-agent init-config data/customers.csv --dataset-name customers --primary-key customer_id --out configs/customers-dq.yml
+dq-agent run configs/customers-dq.yml
+```
+
+`init-config` discovers the current columns and drafts a starting config. It does not magically know your business rules. Review the generated `required_columns`, `non_null`, `allowed_values`, bounds, and expressions before using it as a team contract.
+
 ## Config-Driven Run
 
 ```bash
