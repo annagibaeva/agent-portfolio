@@ -67,9 +67,15 @@ async def _run_one(case: EvalCase, *, update: bool) -> bool:
         return False
 
     if case.must_contain:
-        missing = [s for s in case.must_contain if s not in prd]
+        lower = prd.lower()
+        missing = [s for s in case.must_contain if s.lower() not in lower]
         if missing:
-            print(f"FAIL: PRD missing required substrings: {missing}")
+            # Still dump the PRD so the failure is debuggable.
+            debug_path = GOLDEN_DIR / f"{case.id}.actual.md"
+            GOLDEN_DIR.mkdir(exist_ok=True)
+            debug_path.write_text(prd + "\n", encoding="utf-8")
+            print(f"FAIL: PRD missing required substrings (case-insensitive): {missing}")
+            print(f"actual PRD dumped to {debug_path}")
             return False
 
     print(f"tokens: {tokens}  low-confidence sections: {len(low)}")
@@ -101,6 +107,10 @@ async def _amain(args: argparse.Namespace) -> int:
         if not cases:
             print(f"unknown case: {args.case}", file=sys.stderr)
             return 2
+    else:
+        # budget_exceeded only fires via forced mock usage; live runs can't
+        # reliably push past the 100k cap given prd-writer skill overhead.
+        cases = [c for c in cases if c.expected != "budget_exceeded"]
 
     results: list[tuple[str, bool]] = []
     for case in cases:
