@@ -23,6 +23,10 @@ class IntakeParseError(ValueError):
     """Raised when the intake turn output cannot be parsed as question JSON."""
 
 
+class RejectedIdeaError(RuntimeError):
+    """Raised when the intake turn judges the input is not a real product idea."""
+
+
 @dataclass(frozen=True)
 class Question:
     id: str
@@ -31,7 +35,10 @@ class Question:
 
 
 def parse_questions(text: str) -> list[Question]:
-    """Extract the questions array from a fenced JSON block. Caps at MAX_QUESTIONS."""
+    """Extract the questions array from a fenced JSON block. Caps at MAX_QUESTIONS.
+
+    Raises RejectedIdeaError if the intake turn marked the input as a non-idea.
+    """
     match = _FENCE.search(text)
     raw = match.group(1) if match else text
     try:
@@ -39,6 +46,8 @@ def parse_questions(text: str) -> list[Question]:
         items = data["questions"]
     except (json.JSONDecodeError, KeyError, TypeError) as exc:
         raise IntakeParseError(f"could not parse questions JSON: {exc}") from exc
+    if isinstance(data, dict) and data.get("reject"):
+        raise RejectedIdeaError(str(data["reject"]))
     out: list[Question] = []
     for item in items[:MAX_QUESTIONS]:
         out.append(

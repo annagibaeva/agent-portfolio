@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest tests/test_intake.py -v)",
+      "Bash(python -m pytest tests/test_agent.py -v)",
+      "Bash(python -m pytest tests/test_main.py -v)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "PowerShell(py *)"
+    ]
+  }
+}

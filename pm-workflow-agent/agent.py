@@ -83,7 +83,11 @@ def merge_usage(usages: list[dict]) -> dict:
 
 
 async def _run_validated(prompt, *, system, use_skill, validate):
-    """Run a turn; if validate(text) raises, retry once. Merges usage of both."""
+    """Run a turn; if validate(text) raises, retry once. Merges usage of both.
+
+    RejectedIdeaError is a model verdict, not a parse failure — re-raise
+    immediately without burning a retry.
+    """
     usages: list[dict] = []
     last_exc: Exception | None = None
     for _ in range(2):
@@ -92,6 +96,8 @@ async def _run_validated(prompt, *, system, use_skill, validate):
         try:
             validate(text)
             return text, merge_usage(usages)
+        except intake.RejectedIdeaError:
+            raise
         except Exception as exc:  # noqa: BLE001 - validator decides what's fatal
             last_exc = exc
     assert last_exc is not None

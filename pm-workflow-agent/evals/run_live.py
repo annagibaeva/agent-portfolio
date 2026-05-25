@@ -54,10 +54,23 @@ async def _run_one(case: EvalCase, *, update: bool) -> bool:
         ok = case.expected == "budget_exceeded"
         print(f"BudgetError: {exc}  [{'EXPECTED' if ok else 'UNEXPECTED'}]")
         return ok
+    except intake.RejectedIdeaError as exc:
+        ok = case.expected == "rejected"
+        print(f"RejectedIdeaError: {exc}  [{'EXPECTED' if ok else 'UNEXPECTED'}]")
+        return ok
 
     if case.expected == "budget_exceeded":
         print("FAIL: expected BudgetError, got PRD")
         return False
+    if case.expected == "rejected":
+        print("FAIL: expected RejectedIdeaError, got PRD")
+        return False
+
+    if case.must_contain:
+        missing = [s for s in case.must_contain if s not in prd]
+        if missing:
+            print(f"FAIL: PRD missing required substrings: {missing}")
+            return False
 
     print(f"tokens: {tokens}  low-confidence sections: {len(low)}")
     if case.expected == "low_confidence" and len(low) < case.min_low_confidence:

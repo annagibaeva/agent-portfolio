@@ -24,6 +24,7 @@
 |---|---|---|---|
 | Missing API key | `agent.preflight()` | Print message, exit before any model call | 2 |
 | Missing `prd-writer` skill | `agent.preflight()` | Print message, exit | 2 |
+| Non-idea input | Intake turn returns `{"reject": "..."}`; `intake.parse_questions` raises `RejectedIdeaError` | No retry (model verdict, not parse failure). No PRD written. Logged as `status: rejected` with reason. | 3 |
 | Malformed intake JSON | `intake.parse_questions` raises in validator | Retry the intake turn once. If still bad → `IntakeParseError`, exit | 1 |
 | Malformed draft (no `markdown` fence) | `agent.extract_prd_block` raises in validator | Retry the draft turn once. If still bad → `DraftError`, exit | 1 |
 | Token budget exceeded | Sum of usages > `agent.TOKEN_CAP` (100k) | `BudgetError`, no PRD written, logged as `budget_exceeded` | 1 |

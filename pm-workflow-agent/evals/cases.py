@@ -9,8 +9,11 @@ class EvalCase:
     id: str
     idea: str
     answers: dict[str, str] = field(default_factory=dict)
-    expected: str = "happy_path"  # happy_path | low_confidence | budget_exceeded
+    expected: str = "happy_path"
+    # happy_path | low_confidence | budget_exceeded | rejected
     min_low_confidence: int = 0
+    # For happy_path cases: substrings that must appear somewhere in the PRD.
+    must_contain: tuple[str, ...] = ()
 
 
 LONG_SSO_IDEA = (
@@ -41,17 +44,35 @@ CASES: list[EvalCase] = [
         expected="happy_path",
     ),
     EvalCase(
-        id="happy_path_minimal_intake",
-        idea="Dark mode for TaskFlow web app.",
+        id="heavy_dependencies",
+        idea=(
+            "An audit log export for TaskFlow that streams every workspace "
+            "event to customer-owned S3 buckets in near-real-time, with PII "
+            "redaction and SOC2-grade tamper-evidence."
+        ),
         answers={
-            "problem": "Top-3 user request in 2026 NPS survey.",
-            "persona": "All web users; especially evening users.",
-            "metric": "25% of WAU enable dark mode within 30 days of launch.",
-            "dependencies": "Design tokens refactor (done).",
-            "scope": "In: web app. Out: email, marketing site.",
-            "release": "v3.2 / Q4 2026.",
+            "problem": "Top blocker in 6 enterprise deals; required for healthcare/finance verticals.",
+            "persona": "Compliance officers and security teams at enterprise customers.",
+            "metric": "100% of enterprise tenants enabled within 90 days of GA.",
+            "dependencies": (
+                "Data eng (Kinesis pipeline); Security (PII detection model + SOC2 audit); "
+                "Legal (S3 cross-account DPA template); Platform (multi-region replication); "
+                "Sales (enterprise gating in pricing)."
+            ),
+            "scope": (
+                "In: workspace events, S3 destination, PII redaction. "
+                "Out: Splunk/Datadog connectors, custom event filtering, retroactive export."
+            ),
+            "release": "v3.3 / Q1 2027.",
         },
         expected="happy_path",
+        must_contain=("Data eng", "Security", "Legal", "Platform", "Sales"),
+    ),
+    EvalCase(
+        id="non_idea_rejected",
+        idea="asdf qwer zxcv",
+        answers={},
+        expected="rejected",
     ),
     EvalCase(
         id="low_confidence_partial_answers",

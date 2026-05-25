@@ -22,7 +22,12 @@ OUT_DIR = Path(__file__).parent.parent / "outputs"
 
 
 def _intake_text(case: EvalCase) -> str:
-    """Mock an intake turn: ask one question per missing checklist item."""
+    """Mock an intake turn: ask one question per missing checklist item.
+
+    For 'rejected' cases, return the reject envelope from intake.md.
+    """
+    if case.expected == "rejected":
+        return '```json\n{"reject": "input is not a product idea", "questions": []}\n```'
     missing = [item for item in intake.COVERAGE_CHECKLIST if item["id"] not in case.answers]
     questions = [
         {"id": f"q{i}", "checklist_item": item["id"], "text": f"What is {item['prompt']}?"}
@@ -90,8 +95,10 @@ def test_happy_path_writes_prd_with_no_low_confidence(mocked_agent, case, capsys
     assert rc == 0
     out = capsys.readouterr().out
     assert "LOW CONFIDENCE" not in out
-    prd_files = list(OUT_DIR.glob(f"prd-*{case.id[:10]}*.md")) or list(OUT_DIR.glob("prd-*.md"))
-    assert prd_files, "expected a PRD file written to outputs/"
+    prd_path = sorted(OUT_DIR.glob("prd-*.md"), key=lambda p: p.stat().st_mtime)[-1]
+    prd = prd_path.read_text(encoding="utf-8")
+    for needle in case.must_contain:
+        assert needle in prd, f"expected '{needle}' in PRD for {case.id}"
 
 
 @pytest.mark.parametrize("case", [c for c in CASES if c.expected == "low_confidence"], ids=lambda c: c.id)
@@ -111,3 +118,13 @@ def test_budget_exceeded_raises(mocked_agent):
     mocked_agent(case, draft_usage={"input_tokens": agent.TOKEN_CAP + 1})
     with pytest.raises(agent.BudgetError):
         _run_case(case)
+
+
+def test_non_idea_is_rejected(mocked_agent):
+    case = next(c for c in CASES if c.expected == "rejected")
+    mocked_agent(case)
+    before = set(OUT_DIR.glob("prd-*.md"))
+    with pytest.raises(intake.RejectedIdeaError):
+        _run_case(case)
+    after = set(OUT_DIR.glob("prd-*.md"))
+    assert after == before, "rejected idea must not write a PRD file"

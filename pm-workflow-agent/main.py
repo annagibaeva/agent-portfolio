@@ -75,7 +75,11 @@ async def run(idea: str, answers: dict[str, str] | None) -> int:
 
     intake_text, u = await agent.run_intake(idea)
     usages.append(u)
-    questions = intake.parse_questions(intake_text)
+    try:
+        questions = intake.parse_questions(intake_text)
+    except intake.RejectedIdeaError as exc:
+        logger.log(run_id, step="intake", status="rejected", reason=str(exc))
+        raise
     logger.log(run_id, step="intake", questions=len(questions))
 
     if not questions:
@@ -148,6 +152,9 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\nInterrupted — no PRD written.", file=sys.stderr)
         return 130
+    except intake.RejectedIdeaError as exc:
+        print(f"Idea rejected: {exc}", file=sys.stderr)
+        return 3
     except (agent.DraftError, agent.BudgetError, intake.IntakeParseError) as exc:
         print(f"Run failed: {exc}", file=sys.stderr)
         return 1
