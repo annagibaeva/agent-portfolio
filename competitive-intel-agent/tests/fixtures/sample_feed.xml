@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Linear</title>
+<item><title>SSO beta</title><link>http://linear.app/c/1</link>
+<pubDate>Mon, 12 May 2026 00:00:00 GMT</pubDate>
+<description>SAML SSO is now in beta.</description></item>
+<item><title>Faster search</title><link>http://linear.app/c/2</link>
+<pubDate>Tue, 13 May 2026 00:00:00 GMT</pubDate>
+<description>Search is 2x faster.</description></item>
+</channel></rss>

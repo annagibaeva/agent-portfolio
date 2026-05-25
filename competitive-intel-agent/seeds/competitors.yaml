@@ -1,0 +1,16 @@
+- name: Linear
+  feed_url: https://linear.app/changelog/rss.xml
+  html_url: https://linear.app/changelog
+  css_hint: null
+- name: Asana
+  feed_url: null
+  html_url: https://asana.com/whats-new
+  css_hint: article
+- name: Monday.com
+  feed_url: null
+  html_url: https://support.monday.com/hc/en-us/sections/360002428400
+  css_hint: article
+- name: Jira
+  feed_url: https://jira.atlassian.com/activity
+  html_url: https://www.atlassian.com/software/jira/whats-new
+  css_hint: article
