@@ -96,14 +96,26 @@ def _date_profile(series: pd.Series) -> DateProfile:
 
 
 def _string_profile(series: pd.Series) -> StringProfile:
-    non_null = series.dropna().astype(str)
-    if non_null.empty:
-        return StringProfile()
-    lengths = non_null.str.len()
+    min_length: int | None = None
+    max_length: int | None = None
+    sample_values: list[str] = []
+    seen_samples: set[str] = set()
+
+    for value in series:
+        if pd.isna(value):
+            continue
+        text = str(value)
+        length = len(text)
+        min_length = length if min_length is None else min(min_length, length)
+        max_length = length if max_length is None else max(max_length, length)
+        if len(sample_values) < 5 and text not in seen_samples:
+            sample_values.append(text)
+            seen_samples.add(text)
+
     return StringProfile(
-        min_length=int(lengths.min()),
-        max_length=int(lengths.max()),
-        sample_values=non_null.drop_duplicates().head(5).tolist(),
+        min_length=min_length,
+        max_length=max_length,
+        sample_values=sample_values,
     )
 
 

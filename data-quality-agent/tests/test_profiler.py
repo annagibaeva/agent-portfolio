@@ -25,3 +25,14 @@ def test_profile_dataframe_calculates_column_stats_and_findings():
     assert any(f.finding_id == "duplicate-primary-key" for f in findings)
     assert any(f.finding_id == "empty-column" and f.affected_columns == ["empty_col"] for f in findings)
     assert any(f.finding_id == "mixed-type-column" and f.affected_columns == ["mixed"] for f in findings)
+
+
+def test_profile_dataframe_profiles_string_lengths_without_vectorized_string_allocation():
+    df = pd.DataFrame({"street_name": ["ANG MO KIO AVE 10", "BEDOK", None, "TOA PAYOH CENTRAL"]})
+
+    profile, findings = profile_dataframe(df)
+
+    assert profile.columns["street_name"].string.min_length == 5
+    assert profile.columns["street_name"].string.max_length == 17
+    assert profile.columns["street_name"].string.sample_values[:2] == ["ANG MO KIO AVE 10", "BEDOK"]
+    assert findings == []
