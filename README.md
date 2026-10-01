@@ -1,6 +1,6 @@
 # Agent Portfolio
 
-**What this is.** A summary of the agents I build and the reliability work around them. Each solves a different customer problem; together they cover the agentic capabilities I've worked with. Every build has its own repo, and most have a PRD and a case study.
+**What this is.** A summary of the agents I build and the reliability work around them. Each solves a different customer problem; together they cover the agentic capabilities I've worked with. Every build has its own repo, and most have a PRD and a case study. The release gates from these builds are collected in one stage-gate playbook: **[agent-launch-standard](https://github.com/annagibaeva/agent-launch-standard)**.
 
 ## The problem I build against
 
@@ -16,12 +16,13 @@ You can't prompt a model into never being wrong, so I stopped trying. A second p
 
 The trade-off is the point. A gate that blocks nothing isn't checking anything. A gate that blocks too much means paying for an agent that escalates everything anyway. Where you set it is a product decision, and it needs a number attached.
 
-Mine: turning the gate on took hallucination from 10% to 0%, and deflection from 72% to 58%. Deflection is what a support org buys — tickets closed without a human. So safety cost fourteen points of the thing being paid for. That's the trade a CX leader has to sign, and it should be signed with the number visible rather than discovered later.
+Mine: turning the gate on took hallucination from 7% to 0% and containment from 72% to 66%. Containment is what a support org buys: contacts closed without a human. So safety cost six points of the thing being paid for. That's the trade a CX leader has to sign, and it should be signed with the number visible rather than discovered later.
 
 ## The questions this portfolio answers
 
 | Question | Build |
 |---|---|
+| How do you decide an agent is ready to launch? | [agent-launch-standard](https://github.com/annagibaeva/agent-launch-standard) |
 | How do you stop an agent giving a confident wrong answer, and what does that safety cost? | [wismo-returns](#wismo-returns-reliability-agent) |
 | How do you decide whether a change is safe to ship? | [payments-harness](#payments-harness) |
 | How do you find failures that already shipped looking successful? | [Silent-failure-detector](#silent-failure-detector) |
@@ -40,7 +41,7 @@ Mine: turning the gate on took hallucination from 10% to 0%, and deflection from
 | Beauty, clinics, fitness | Booking rules exist for safety, not convenience. The agent books past a requirement the customer was never asked about. | [whatsapp-commerce-agent](#whatsapp-commerce-agent) |
 | Chat commerce | Inventory truth lives in the chat thread, so the last unit gets sold twice. | [business-state](#business-state) |
 
-The pattern is the same every time. The agent is fluent, the customer is satisfied, and something underneath is wrong.
+Every row is the same failure: the customer gets a confident answer the system never backed.
 
 ---
 
@@ -49,8 +50,8 @@ The pattern is the same every time. The agent is fluent, the customer is satisfi
 | Decision | Why | Built into | Read more |
 |---|---|---|---|
 | **Treat fabrication as its own severity class** | Accuracy can tolerate one honest miss. Fabrication can't. A made-up fee is a compliance event; a wrong answer is a bug. | payments-harness | [threshold rationale](https://github.com/annagibaeva/payments-harness/blob/main/docs/threshold-rationale.md) |
-| **Pay for safety in deflection, deliberately** | 72% → 58%, published as a price rather than hidden. If a client won't pay it, better to know before deployment than after. | wismo-returns | [case study](https://github.com/annagibaeva/wismo-returns-reliability-agent/blob/main/docs/case-study.md) |
-| **Make the success criteria ungameable first** | Hallucination, recall and handoff precision have to clear at once. Each one alone is gamed by answering everything or refusing everything. | wismo-returns | [win condition](https://github.com/annagibaeva/wismo-returns-reliability-agent#the-win-condition) |
+| **Pay for safety in containment, deliberately** | 72% → 66%, published as a price rather than hidden. If a client won't pay it, better to know before deployment than after. | wismo-returns | [case study](https://github.com/annagibaeva/wismo-returns-reliability-agent/blob/main/docs/case-study.md) |
+| **Make the success criteria ungameable first** | Hallucination, recall, handoff precision, silent fact errors and safety routing have to clear at once. Each one alone is gamed by answering everything or refusing everything. | wismo-returns | [win condition](https://github.com/annagibaeva/wismo-returns-reliability-agent#the-win-condition) |
 | **Keep the model off the gate path** | Scoring is fully deterministic. No LLM decides ship or no-ship. An LLM judge is a deferred V2, advisory only. | payments-harness, whatsapp | [threshold rationale](https://github.com/annagibaeva/payments-harness/blob/main/docs/threshold-rationale.md) |
 | **Hold policy as data, not code** | Rules live in JSON, each carrying the sentence it came from. Changing policy is an edit, not a deploy, so a non-engineer can own it. | whatsapp-commerce-agent | [PRD](https://github.com/annagibaeva/whatsapp-commerce-agent/blob/master/docs/PRD-whatsapp-commerce-agent.md) |
 | **Publish the runs that failed** | The regression that caught me, plus a "what this does not demonstrate" table in each repo naming the assumption that would hurt most if false. | every build | [case study](https://github.com/annagibaeva/payments-harness/blob/main/docs/case-study.md) |
@@ -67,17 +68,17 @@ Same four fields each: the problem, what I built, what it produced, and what to 
 
 **Solution.** The agent resolves what it can ground in policy and hands off what it can't. Intent router → order lookup → rule retrieval → the model proposes an outcome with cited rule IDs → a deterministic gate runs four grounding checks plus a precedence check for conflicting rules → resolve or hand off, reason logged either way. Python, no framework. The point is to let you choose where you sit between automating everything and eating the wrong answers, and to know what the position costs.
 
-**Output.** Three targets have to clear at once, because each alone is gameable: hallucination ≤ 2%, resolution recall ≥ 80%, handoff precision ≥ 85%.
+**Output.** Five targets have to clear at once, because each alone is gameable: hallucination ≤ 2%, resolution recall ≥ 80%, handoff precision ≥ 85%, silent fact errors ≤ 2%, and every safety case routed to a human. On the live model path it clears all five in English, Spanish and Indonesian.
 
 | | Gate OFF | Gate ON |
 |---|---|---|
-| Hallucination | 10% | **0%** |
-| Resolution precision | 81% | **100%** |
-| Policy-error rate | 10% | **0%** |
-| Resolution recall | 83% | 83% *(held)* |
-| Deflection | 72% | **58%** *(the price)* |
+| Hallucination | 7% (3/44) | **0%** (0/40) |
+| Resolution precision | 91% | **100%** |
+| Policy-error rate | 2% | **0%** |
+| Resolution recall | 93% | 93% *(held)* |
+| Containment | 72% | **66%** *(the price)* |
 
-**Watch-outs.** Measured against `--backend stub`, a deliberately naive offline proposer, so this shows the mechanism working rather than a real-model baseline. n=43, directional.
+**Watch-outs.** 65 seed tickets per language, 43 of them answerable, so one ticket moves recall 2.3 points and the hallucination interval runs to 8.8% against a 2% target. English, Spanish and Indonesian are one corpus translated three ways, and the grading is self-checked. Directional.
 
 → [case study](https://github.com/annagibaeva/wismo-returns-reliability-agent/blob/main/docs/case-study.md) · [architecture](https://github.com/annagibaeva/wismo-returns-reliability-agent/blob/main/docs/architecture.md) · [demo](https://github.com/annagibaeva/wismo-returns-reliability-agent/blob/main/docs/demo-script.md)
 
@@ -138,7 +139,7 @@ The useful result is the red one. Temperature 0.0 → 1.0, the change a team mak
 - **[superset-fixes-showcase](https://github.com/annagibaeva/superset-fixes-showcase)** — Docker demos of security fixes to my Apache Superset fork. 7 merged PRs, built with Devin; I owned the design calls.
 - **[morning-briefing-agent](https://github.com/annagibaeva/morning-briefing-agent)** — daily brief from Calendar, Gmail and AI news. The first one. Scheduled runs, graceful degradation.
 - **[meeting-prep-agent](https://github.com/annagibaeva/meeting-prep-agent)** — one-page brief per meeting via the Claude Agent SDK, with in-process MCP tools.
-- **[tau2-bench-sierra](https://github.com/annagibaeva/tau2-bench-sierra)** *(fork)* — Sierra's τ²-bench, used to score the returns agent against an external standard.
+- **[tau2-bench-sierra](https://github.com/annagibaeva/tau2-bench-sierra)** *(fork)* — τ²-bench, a public customer-service agent benchmark, used to score the returns agent against an external standard.
 
 **Also in this repo**, earlier agents kept for the record: [competitive-intel-agent](./competitive-intel-agent) (weekly competitor changelog diff via a DB-free MCP server; 42 unit tests, 7 golden evals) · [pm-workflow-agent](./pm-workflow-agent) (idea → ≤6 clarifying questions → PRD) · [data-quality-agent](./data-quality-agent) · [meeting-prep-agent](./meeting-prep-agent) · [morning-briefing-agent](./morning-briefing-agent). Conventions: [CLAUDE.md](./CLAUDE.md).
 
@@ -150,8 +151,8 @@ The full map of agentic capabilities and the mechanism behind each — routing, 
 
 ## On the numbers
 
-Sample sizes are small: 43 tickets, 19 benchmark tasks, 20 salon cases. At that scale a percentage is a handful of events, so intervals are wide and the reports carry them where they're computed. Treat these as directional.
+Sample sizes are small: 65 tickets per language (43 answerable), 19 benchmark tasks, 20 salon cases. At that scale a percentage is a handful of events, so intervals are wide and the reports carry them where they're computed. Treat these as directional.
 
 Each README says which claims were checked by running a command and which weren't. business-state opens with the two things it never ran. whatsapp-commerce-agent has a table of what it does *not* demonstrate. That's deliberate: a portfolio that reports only its green runs is the same failure mode these builds exist to catch.
 
-**In progress:** a harder version of the wismo benchmark. The corpus grew to 65 tickets with fault and safety tiers, the success criteria grew from three clauses to five, every metric now carries a 95% confidence interval, and there's an English/Spanish split. Under the tighter definition the agent currently fails two clauses. That result will be published as-is.
+**Done since the last update:** the harder wismo benchmark. 65 tickets with fault and safety tiers, five clauses instead of three, a 95% interval on every metric, and English, Spanish and Indonesian. On the live model path it clears all five clauses in every language. At this sample size that is directional, not proven.
